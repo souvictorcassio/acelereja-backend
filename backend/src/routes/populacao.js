@@ -65,10 +65,36 @@ router.post("/cadastrar", async (req, res) => {
   }
 });
 
+// ✅ ROTA: Atualizar dados de contato e endereço
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { telefone, estado, cidade, bairro, endereco, cep } = req.body;
+
+    const populacaoAtualizada = await prisma.populacao.update({
+      where: { id: Number(id) },
+      data: { telefone, estado, cidade, bairro, endereco, cep },
+    });
+
+    res.json({
+      message: "Dados atualizados com sucesso!",
+      populacao: populacaoAtualizada,
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar perfil:", error);
+    res.status(500).json({ erro: "Erro ao atualizar perfil." });
+  }
+});
+
 // ✅ ROTA: Buscar dados do perfil da população
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
+    // ❗ Correção essencial
+    if (!id || isNaN(Number(id))) {
+      return res.status(400).json({ erro: "ID inválido." });
+    }
 
     const populacao = await prisma.populacao.findUnique({
       where: { id: Number(id) },
@@ -89,27 +115,6 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar perfil:", error);
     res.status(500).json({ erro: "Erro ao buscar perfil da população." });
-  }
-});
-
-// ✅ ROTA: Atualizar dados de contato e endereço
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { telefone, estado, cidade, bairro, endereco, cep } = req.body;
-
-    const populacaoAtualizada = await prisma.populacao.update({
-      where: { id: Number(id) },
-      data: { telefone, estado, cidade, bairro, endereco, cep },
-    });
-
-    res.json({
-      message: "Dados atualizados com sucesso!",
-      populacao: populacaoAtualizada,
-    });
-  } catch (error) {
-    console.error("Erro ao atualizar perfil:", error);
-    res.status(500).json({ erro: "Erro ao atualizar perfil." });
   }
 });
 
