@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================================
+// ENUMS
+// ==========================================================
+enum UserType {
+  GOVERNO
+  POPULACAO
+  INSTITUICAO
+}
+
+// ==========================================================
+// MODELO BASE DE USUÁRIO
+// ==========================================================
+model User {
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  senha          String
+  tipo           UserType
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relacionamentos (1:1)
+  governoId      Int?          @unique
+  populacaoId    Int?          @unique
+  instituicaoId  Int?          @unique
+
+  governo         Governo?      @relation(fields: [governoId], references: [id])
+  populacao       Populacao?    @relation(fields: [populacaoId], references: [id])
+  instituicao     Instituicao?  @relation(fields: [instituicaoId], references: [id])
+}
+
+// ==========================================================
+// MODELO — GOVERNO
+// ==========================================================
+model Governo {
+  id               Int       @id @default(autoincrement())
+  nomeResponsavel  String
+  cargo            String
+  secretaria       String
+  estado           String
+  telefone         String
+  user             User?
+  instituicoes     Instituicao[]
+}
+
+// ==========================================================
+// MODELO — POPULAÇÃO (CIDADÃO)
+// ==========================================================
+model Populacao {
+  id              Int         @id @default(autoincrement())
+  nome            String
+  cpf             String      @unique
+  dataNascimento  DateTime
+  telefone        String
+  estado          String
+  cidade          String
+  bairro          String
+  endereco        String
+  cep             String
+  escolaridade    String
+  user            User?
+  matriculas      Matricula[]
+}
+
+// ==========================================================
+// MODELO — INSTITUIÇÃO DE ENSINO
+// ==========================================================
+model Instituicao {
+  id              Int         @id @default(autoincrement())
+  nome            String
+  codigoINEP      String      @unique
+  estado          String
+  cidade          String
+  bairro          String
+  rua             String
+  numero          String
+  cep             String
+  telefone        String
+  email           String
+  turnos          String      // Ex: "Matutino,Vespertino,Noturno"
+  niveis          String      // Ex: "Ensino Fundamental - Anos Finais,Ensino Médio"
+  admissao        String      // "Online", "Presencial" ou "Ambas"
+  observacoes     String?
+  user            User?
+
+  governoId       Int?
+  governo         Governo?    @relation(fields: [governoId], references: [id])
+
+  matriculas      Matricula[]
+}
+
+// ==========================================================
+// MODELO — MATRÍCULA (ligação População ↔ Instituição)
+// ==========================================================
+model Matricula {
+  id              Int          @id @default(autoincrement())
+  populacaoId     Int
+  instituicaoId   Int
+  status          String       @default("PENDENTE") // PENDENTE, DEFERIDA, INDEFERIDA
+  dataSolicitacao DateTime     @default(now())
+  dataResposta    DateTime?
+
+  populacao       Populacao    @relation(fields: [populacaoId], references: [id])
+  instituicao     Instituicao  @relation(fields: [instituicaoId], references: [id])
+}
