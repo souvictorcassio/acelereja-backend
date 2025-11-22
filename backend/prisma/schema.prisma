@@ -41,12 +41,13 @@ model User {
 // MODELO — GOVERNO
 // ==========================================================
 model Governo {
-  id               Int       @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   nomeResponsavel  String
   cargo            String
   secretaria       String
   estado           String
   telefone         String
+
   user             User?
   instituicoes     Instituicao[]
 }
@@ -55,9 +56,9 @@ model Governo {
 // MODELO — POPULAÇÃO (CIDADÃO)
 // ==========================================================
 model Populacao {
-  id              Int         @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   nome            String
-  cpf             String      @unique
+  cpf             String        @unique
   dataNascimento  DateTime
   telefone        String
   estado          String
@@ -66,6 +67,7 @@ model Populacao {
   endereco        String
   cep             String
   escolaridade    String
+
   user            User?
   matriculas      Matricula[]
 }
@@ -74,9 +76,9 @@ model Populacao {
 // MODELO — INSTITUIÇÃO DE ENSINO
 // ==========================================================
 model Instituicao {
-  id              Int         @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   nome            String
-  codigoINEP      String      @unique
+  codigoINEP      String        @unique
   estado          String
   cidade          String
   bairro          String
@@ -85,26 +87,27 @@ model Instituicao {
   cep             String
   telefone        String
   email           String
-  turnos          String      // Ex: "Matutino,Vespertino,Noturno"
-  niveis          String      // Ex: "Ensino Fundamental - Anos Finais,Ensino Médio"
-  admissao        String      // "Online", "Presencial" ou "Ambas"
+  turnos          String        // Ex: "Matutino,Vespertino,Noturno"
+  niveis          String        // Ex: "Ensino Fundamental - Anos Finais,Ensino Médio"
+  admissao        String        // "Online", "Presencial" ou "Ambas"
   observacoes     String?
+
   user            User?
 
   governoId       Int?
-  governo         Governo?    @relation(fields: [governoId], references: [id])
+  governo         Governo?      @relation(fields: [governoId], references: [id])
 
   matriculas      Matricula[]
 }
 
 // ==========================================================
-// MODELO — MATRÍCULA (ligação População ↔ Instituição)
+// MODELO — MATRÍCULA (População ↔ Instituição)
 // ==========================================================
 model Matricula {
   id              Int          @id @default(autoincrement())
   populacaoId     Int
   instituicaoId   Int
-  status          String       @default("PENDENTE") // PENDENTE, DEFERIDA, INDEFERIDA
+  status          String       @default("PENDENTE")
   dataSolicitacao DateTime     @default(now())
   dataResposta    DateTime?
 
