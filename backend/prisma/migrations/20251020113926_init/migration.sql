@@ -1,3 +1,10 @@
+-- Create UserType ENUM
+CREATE TYPE "UserType" AS ENUM (
+  'GOVERNO',
+  'POPULACAO',
+  'INSTITUICAO'
+);
+
 -- CreateTable: Governo
 CREATE TABLE "Governo" (
     "id" SERIAL PRIMARY KEY,
@@ -51,7 +58,7 @@ CREATE TABLE "User" (
     "id" SERIAL PRIMARY KEY,
     "email" TEXT NOT NULL,
     "senha" TEXT NOT NULL,
-    "tipo" TEXT NOT NULL,
+    "tipo" "UserType" NOT NULL,
     "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP NOT NULL,
     "governoId" INTEGER,
